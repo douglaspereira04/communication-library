@@ -265,8 +265,8 @@ public class GroupCommunicator {
 	 * @return delivered message
 	 * @throws InterruptedException
 	 */
-	public Object receive() throws InterruptedException {
-		return this.delivered.take().getPayload();
+	public Message receive() throws InterruptedException {
+		return this.delivered.take();
 	}
 
 
@@ -276,10 +276,10 @@ public class GroupCommunicator {
 	 * @return delivered message or null
 	 * @throws InterruptedException
 	 */
-	public Object receive(long timeout) throws InterruptedException {
+	public Message receive(long timeout) throws InterruptedException {
 		Message message = this.delivered.poll(timeout, TimeUnit.MILLISECONDS);
 		if(message != null) {
-			return message.getPayload();
+			return message;
 		}
 		return null;
 	}
@@ -410,6 +410,14 @@ public class GroupCommunicator {
 
 	public int getNeighbor() {
 		return this.ids.get((this.ids.indexOf(this.id)+1)%this.ids.size());
+	}
+	
+	public CopyOnWriteArrayList<Message> getPending() {
+		return this.pending;
+	}
+	
+	public LinkedBlockingQueue<Message> getDelivered(){
+		return this.delivered;
 	}
 	
 }

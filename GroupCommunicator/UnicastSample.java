@@ -30,13 +30,13 @@ public class UnicastSample {
 
 		}
 		if (gc.getId() == 1) {
-			System.err.println((String) (gc.receive()));
+			System.err.println((String) (gc.receive().getPayload()));
 			String m = "1";
 			gc.send(2, m);
 		}
 		if (gc.getId() == 2) {
 			for (int i = 0; i < 2; i++) {
-				System.err.println((String) (gc.receive()));
+				System.err.println((String) (gc.receive().getPayload()));
 			}
 		}
 		

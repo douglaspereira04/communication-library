@@ -36,7 +36,7 @@ public class ChangRobertsSample {
 			try {
 				while(!stop) {
 					Thread.sleep(1000);
-					Object[] message = (Object[]) gc.receive(100);
+					Object[] message = (Object[]) gc.receive(100).getPayload();
 					if(message != null) {
 						if(message[0].equals("election")) {
 							//eleição
