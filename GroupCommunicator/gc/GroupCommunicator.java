@@ -9,11 +9,10 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class GroupCommunicator {
 
 	// Thread safe lists
-	protected List<Message> pending;// Not delivered
+	protected CopyOnWriteArrayList<Message> pending;// Not delivered
 	protected LinkedBlockingQueue<Message> delivered;
 	protected Semaphore receivedSem;
 	protected Thread deliverThread;
@@ -55,7 +54,7 @@ public class GroupCommunicator {
 	public GroupCommunicator(int id, Map<Integer, InetSocketAddress> socketAddresses, List<Integer> ids) {
 		this.id = id;
 		this.socketAddresses = socketAddresses;
-		this.pending = Collections.synchronizedList(new ArrayList<>());
+		this.pending = new CopyOnWriteArrayList<>();
 		this.delivered = new LinkedBlockingQueue<>();
 		this.receivedSem = new Semaphore(0);
 

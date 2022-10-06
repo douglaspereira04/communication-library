@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Scanner;
 
 import gc.ConfigLoader;
@@ -24,19 +23,13 @@ public class BroadcastSample {
 		System.out.println("Init");
 		gc.init();
 		System.out.println("Done");
-
-		gc.setDelayedBroadcast(true);
-		int broadcastsAmount = Integer.valueOf(args[1]);
-		for (int i = 0; i < broadcastsAmount; i++) {
-			String m = gc.getId()+"-"+i;
-			gc.broadcast(m);
-		}
 		
 		Thread receiveingThread = new Thread(()->{
 			try {
 				while (!stop) {
 					Object received = gc.receive(100);
 					if(received != null) {
+						Thread.sleep(1000);
 						System.err.println((String)received);
 					}
 				}
@@ -46,6 +39,14 @@ public class BroadcastSample {
 		});
 		
 		receiveingThread.start();
+
+		gc.setDelayedBroadcast(true);
+		int broadcastsAmount = Integer.valueOf(args[1]);
+		for (int i = 0; i < broadcastsAmount; i++) {
+			String m = gc.getId()+"-"+i;
+			Thread.sleep(1000);
+			gc.broadcast(m);
+		}
 		scanner.nextLine();
 		stop = true;
 		receiveingThread.join();
