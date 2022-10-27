@@ -109,7 +109,7 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 		if(this.delayedBroadcast == true) {
 			Random rand = new Random();
 			int pos = rand.nextInt(this.ids.size());
-			int delay = rand.nextInt(2000) + 500;
+			int delay = rand.nextInt(5000) + 500;
 			int toDelay = this.ids.get(pos);
 			this.broadcast(message, toDelay, delay);
 		}else {
