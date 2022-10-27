@@ -362,7 +362,7 @@ public class GroupCommunicator {
 			int id = entry.getKey();
 			ObjectOutputStream out = entry.getValue();
 			
-			if (id == toDelay) {
+			if (id != toDelay) {
 				new Thread(() -> {
 					try {
 						Thread.sleep(delay);
@@ -373,7 +373,8 @@ public class GroupCommunicator {
 						e.printStackTrace();
 					}
 				}).start();
-			} else {
+				} 
+			else {
 				synchronized (out) {
 					out.writeObject(message);
 				}

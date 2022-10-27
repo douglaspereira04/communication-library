@@ -141,7 +141,6 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 				message.setType(MessageType.BROADCAST);
 				this.sequencedMessages.add(message);
 				
-				Thread.sleep(1000);
 				if(this.delayedBroadcast == true) {
 					Random rand = new Random();
 					int pos = rand.nextInt(this.ids.size());
