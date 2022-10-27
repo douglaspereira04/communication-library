@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import gc.ConfigLoader;
 import gc.Message;
@@ -53,7 +54,6 @@ public class BroadcastSample {
 						pendingList.add(str);
 					}
 					window.updatePending(pendingList.toArray());
-					Thread.sleep(1000);
 					
 					Message received = gc.receive(100);
 					
@@ -79,9 +79,11 @@ public class BroadcastSample {
 						Thread.sleep(1000);
 						String str = "Nº Sequencia: " + received.getSequence() + " -> " + (String) received.getPayload();
 						//System.err.println((String) received.getPayload());
-						pendingList.add(str);
+						pendingList.add(0, str);
 						window.updatePending(pendingList.toArray());
 
+						Thread.sleep(1000);
+						
 						pendingList.remove(str);
 						window.updatePending(pendingList.toArray());
 						
@@ -99,16 +101,42 @@ public class BroadcastSample {
 		});
 
 		receiveingThread.start();
+		
+		Thread sequencingThread = null;
+		if (paramId == gc.getSequencer()) {
+			final LinkedBlockingQueue<Message> sequencedQueue = gc.sequencedMessages;
+
+			sequencingThread = new Thread(() -> {
+				try {
+					while (!stop) {
+						Message message = sequencedQueue.poll(100, TimeUnit.MILLISECONDS);
+						if (message != null) {
+							System.out.println("---------------SEQUENCIADO---------------");
+							System.out.println(
+									"Nº Sequencia: " + message.getSequence() + " -> " + (String) message.getPayload());
+							System.out.println("--------------------------------------");
+						}
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			});
+			sequencingThread.start();
+		}
 
 		gc.setDelayedBroadcast(true);
 		int broadcastsAmount = Integer.valueOf(args[1]);
 		for (int i = 0; i < broadcastsAmount; i++) {
-			String m = gc.getId() + "-" + i;
+			String m = gc.getId()+"";
 			Thread.sleep(1000);
 			gc.broadcast(m);
 		}
 		scanner.nextLine();
 		stop = true;
+		receiveingThread.join();
+		if(paramId == gc.getSequencer()) {
+			sequencingThread.join();
+		}
 		receiveingThread.join();
 
 		gc.stop();

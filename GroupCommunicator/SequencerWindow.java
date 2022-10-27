@@ -6,26 +6,23 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class NodeWindow extends JFrame {
-	private static final long serialVersionUID = 678710702309785755L;
+public class SequencerWindow extends JFrame {
 	
+	private static final long serialVersionUID = -5431964320762825207L;
 	protected JPanel panel = new JPanel();
-	protected JLabel idLabel = new JLabel();
 	protected JLabel sequenceLabel = new JLabel();
-	protected int seq = 0;
+
 	protected JList<Object> pendingList = new JList<>();
 
 	protected JList<Object> receivedList = new JList<>();
 	protected ArrayList<Object> receivedArray = new ArrayList<>();
 	
 	protected JScrollPane scroll;
-	public NodeWindow(int id) {
+	public SequencerWindow() {
 
 		this.setSize(400,400);
-
-		idLabel.setText("ID: "+id);
-		panel.add(idLabel);
-		sequenceLabel.setText("SEQ: "+seq);
+		
+		sequenceLabel.setText("SEQ: 0");
 		panel.add(sequenceLabel);
 
 		pendingList.setListData(new Object[] {"Vazia"});
@@ -47,8 +44,6 @@ public class NodeWindow extends JFrame {
 	public void updateReceived(Object received) {
 		receivedArray.add(received);
 		receivedList.setListData(receivedArray.toArray());
-		seq++;
-		sequenceLabel.setText("SEQ: "+seq);
 		panel.invalidate();
 		panel.validate();
 		panel.repaint();

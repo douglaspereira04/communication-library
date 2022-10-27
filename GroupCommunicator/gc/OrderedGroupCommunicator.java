@@ -9,8 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class OrderedGroupCommunicator extends GroupCommunicator {
@@ -21,6 +21,10 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 	protected long next = 0;
 	protected Map<Integer,VectorClock> vectorClocks;
 	protected boolean delayedBroadcast = false;
+	
+	protected Thread broadcastThread;
+	
+	protected LinkedBlockingQueue<Message> toBroadcastMessageQueue = new LinkedBlockingQueue<>();
 	
 	public LinkedBlockingQueue<Message> sequencedMessages = new LinkedBlockingQueue<>();
 
@@ -51,8 +55,27 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 				e.printStackTrace();
 			}
 		});
+		
+		this.broadcastThread = new Thread(()->{
+			try {
+				this.sequencerBroadcast();
+			} catch (InterruptedException | IOException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 	
+	
+	
+	@Override
+	public void start() {
+		// TODO Auto-generated method stub
+		super.start();
+		this.broadcastThread.start();
+	}
+
+
+
 	/**
 	 * Puts received messages in pending list and notifies deliver thread, 
 	 * through semaphore, that messages were received. 
@@ -66,6 +89,8 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 	 */
 	@Override
 	public void receiveMessages(int j) throws ClassNotFoundException, IOException {
+		
+			
 		Message message;
 		ObjectInputStream in = this.inStream.get(j);
 		while (!this.stop) {
@@ -74,7 +99,7 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 				this.stop = true;
 				this.broadcast(message);
 			}else if (message.getType() == MessageType.SEQ) {
-				this.sequencerBroadcast(message);
+				toBroadcastMessageQueue.add(message);
 			} else {
 				this.pending.add(message);
 				this.receivedSem.release();
@@ -105,20 +130,28 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 	 * 
 	 * @param message
 	 * @throws IOException
+	 * @throws InterruptedException 
 	 */
-	public void sequencerBroadcast(Message message) throws IOException {
-		long sequence = this.sequence.getAndIncrement();
-		message.setSequence(sequence);
-		message.setType(MessageType.BROADCAST);
-		this.sequencedMessages.add(message);
-		if(this.delayedBroadcast == true) {
-			Random rand = new Random();
-			int pos = rand.nextInt(this.ids.size());
-			int delay = rand.nextInt(5000) + 500;
-			int toDelay = this.ids.get(pos);
-			this.broadcast(message, toDelay, delay);
-		}else {
-			this.broadcast(message);
+	public void sequencerBroadcast() throws IOException, InterruptedException {
+		while (!this.stop) {
+			Message message = this.toBroadcastMessageQueue.poll(100, TimeUnit.MILLISECONDS);
+			if(message != null) {
+				long sequence = this.sequence.getAndIncrement();
+				message.setSequence(sequence);
+				message.setType(MessageType.BROADCAST);
+				this.sequencedMessages.add(message);
+				
+				Thread.sleep(1000);
+				if(this.delayedBroadcast == true) {
+					Random rand = new Random();
+					int pos = rand.nextInt(this.ids.size());
+					int delay = rand.nextInt(10000);
+					int toDelay = this.ids.get(pos);
+					this.broadcast(message, toDelay, delay);
+				}else {
+					this.broadcast(message);
+				}
+			}
 		}
 		
 	}
