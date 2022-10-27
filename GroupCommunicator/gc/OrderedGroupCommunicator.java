@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class OrderedGroupCommunicator extends GroupCommunicator {
@@ -19,6 +21,8 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 	protected long next = 0;
 	protected Map<Integer,VectorClock> vectorClocks;
 	protected boolean delayedBroadcast = false;
+	
+	public LinkedBlockingQueue<Message> sequencedMessages = new LinkedBlockingQueue<>();
 
 	public OrderedGroupCommunicator(int id, Map<Integer, InetSocketAddress> socketAddresses, List<Integer> ids, int sequencer) {
 		super(id, socketAddresses, ids);
@@ -106,6 +110,7 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 		long sequence = this.sequence.getAndIncrement();
 		message.setSequence(sequence);
 		message.setType(MessageType.BROADCAST);
+		this.sequencedMessages.add(message);
 		if(this.delayedBroadcast == true) {
 			Random rand = new Random();
 			int pos = rand.nextInt(this.ids.size());
@@ -115,6 +120,7 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 		}else {
 			this.broadcast(message);
 		}
+		
 	}
 
 	/**
@@ -311,6 +317,5 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 	public void setDelayedBroadcast(boolean delayedBroadcast) {
 		this.delayedBroadcast = delayedBroadcast;
 	}
-	
 
 }
