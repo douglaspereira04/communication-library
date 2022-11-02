@@ -1,0 +1,3 @@
+javac gc/*.java
+	jar cf gc.jar gc/GroupCommunicator.class gc/Message.class gc/MessageType.class gc/OrderedGroupCommunicator.class gc/VectorClock.class gc/ConfigLoader.class
+	javac -cp gc.jar *.java

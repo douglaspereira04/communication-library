@@ -357,11 +357,17 @@ public class GroupCommunicator {
 	 * @param payload
 	 * @throws IOException
 	 */
-	public void broadcast(Message message, int toDelay, int delay) throws IOException {
+	public void broadcast(Message message, int toDelay, int delay, int baseDelay) throws IOException {
 		for (Map.Entry<Integer, ObjectOutputStream> entry : outStream.entrySet()) {
 			int id = entry.getKey();
 			ObjectOutputStream out = entry.getValue();
-			
+
+			try {
+				Thread.sleep(baseDelay);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			if (id != toDelay) {
 				new Thread(() -> {
 					try {
