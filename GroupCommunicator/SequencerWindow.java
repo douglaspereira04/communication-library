@@ -11,42 +11,35 @@ public class SequencerWindow extends JFrame {
 	private static final long serialVersionUID = -5431964320762825207L;
 	protected JPanel panel = new JPanel();
 	protected JLabel sequenceLabel = new JLabel();
-
-	protected JList<Object> pendingList = new JList<>();
-
-	protected JList<Object> receivedList = new JList<>();
-	protected ArrayList<Object> receivedArray = new ArrayList<>();
+	protected JLabel sequencedLabel = new JLabel();
+	protected int seq = 0;
 	
 	protected JScrollPane scroll;
 	public SequencerWindow() {
 
 		this.setSize(400,400);
 		
-		sequenceLabel.setText("SEQ: 0");
+		sequenceLabel.setText("SEQ: 0  ");
 		panel.add(sequenceLabel);
-
-		pendingList.setListData(new Object[] {"Vazia"});
-		receivedList.setListData(receivedArray.toArray());
-		panel.add(pendingList);
-		panel.add(receivedList);
+		panel.add(sequencedLabel);
 		scroll = new JScrollPane(panel);
 		this.setContentPane(scroll);
 		this.setVisible(true);
 	}
-	
-	public void updatePending(Object[] data) {
-		pendingList.setListData(data);
+	public void updateSequence() {
+		seq++;
+		sequenceLabel.setText("SEQ: "+seq);
 		panel.invalidate();
 		panel.validate();
 		panel.repaint();
 	}
 	
-	public void updateReceived(Object received) {
-		receivedArray.add(received);
-		receivedList.setListData(receivedArray.toArray());
+	public void updateSequenced(String sequenced) {
+		sequencedLabel.setText(sequenced);
 		panel.invalidate();
 		panel.validate();
 		panel.repaint();
 	}
+	
 	
 }

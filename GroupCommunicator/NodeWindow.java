@@ -17,12 +17,14 @@ public class NodeWindow extends JFrame {
 
 	protected JList<Object> receivedList = new JList<>();
 	protected ArrayList<Object> receivedArray = new ArrayList<>();
+	protected JLabel sentLabel = new JLabel();
 	
 	protected JScrollPane scroll;
 	public NodeWindow(int id) {
 
 		this.setSize(400,400);
 
+		panel.add(sentLabel);
 		idLabel.setText("ID: "+id);
 		panel.add(idLabel);
 		sequenceLabel.setText("SEQ: "+seq);
@@ -49,6 +51,13 @@ public class NodeWindow extends JFrame {
 		receivedList.setListData(receivedArray.toArray());
 		seq++;
 		sequenceLabel.setText("SEQ: "+seq);
+		panel.invalidate();
+		panel.validate();
+		panel.repaint();
+	}
+	
+	public void updateLastSent(String sent) {
+		sentLabel.setText(sent);
 		panel.invalidate();
 		panel.validate();
 		panel.repaint();

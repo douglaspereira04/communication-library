@@ -42,6 +42,7 @@ public class GroupCommunicator {
 	protected List<Integer> ids;
 	
 	protected boolean stop = false;
+	public static float TIME_FACTOR = 1;
 
 
 	/**
@@ -363,7 +364,7 @@ public class GroupCommunicator {
 			ObjectOutputStream out = entry.getValue();
 
 			try {
-				Thread.sleep(baseDelay);
+				Thread.sleep((int)GroupCommunicator.TIME_FACTOR*baseDelay);
 			} catch (InterruptedException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -371,7 +372,7 @@ public class GroupCommunicator {
 			if (id != toDelay) {
 				new Thread(() -> {
 					try {
-						Thread.sleep(delay);
+						Thread.sleep((int)GroupCommunicator.TIME_FACTOR*delay);
 						synchronized (out) {
 							out.writeObject(message);
 						}

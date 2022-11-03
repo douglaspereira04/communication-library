@@ -144,8 +144,7 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 				if(this.delayedBroadcast == true) {
 					Random rand = new Random();
 					int pos = rand.nextInt(this.ids.size());
-					int delay = 5000+rand.nextInt(5000);
-					Thread.sleep(1000);
+					int delay = 500+rand.nextInt(10000);
 					int toDelay = this.ids.get(pos);
 					this.broadcast(message, toDelay, delay, 500);
 				}else {
@@ -309,7 +308,7 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 			ObjectOutputStream out = this.outStream.get(id);
 			new Thread(() -> {
 				try {
-					Thread.sleep(delay);
+					Thread.sleep((int)GroupCommunicator.TIME_FACTOR*delay);
 					synchronized (out) {
 						out.writeObject(message);
 					}

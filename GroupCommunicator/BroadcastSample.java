@@ -1,12 +1,14 @@
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import gc.ConfigLoader;
+import gc.GroupCommunicator;
 import gc.Message;
 import gc.OrderedGroupCommunicator;
 
@@ -76,13 +78,13 @@ public class BroadcastSample {
 						//System.out.println("--------------------------------------");
 
 						//System.out.println("---------------RECEBIDO---------------");
-						Thread.sleep(1000);
+						Thread.sleep((int)GroupCommunicator.TIME_FACTOR*500);
 						String str = "Nº Sequencia: " + received.getSequence() + " -> " + (String) received.getPayload();
 						//System.err.println((String) received.getPayload());
 						pendingList.add(0, str);
 						window.updatePending(pendingList.toArray());
 
-						Thread.sleep(1000);
+						Thread.sleep((int)GroupCommunicator.TIME_FACTOR*500);
 						
 						pendingList.remove(str);
 						window.updatePending(pendingList.toArray());
@@ -105,7 +107,7 @@ public class BroadcastSample {
 		Thread sequencingThread = null;
 		if (paramId == gc.getSequencer()) {
 			final LinkedBlockingQueue<Message> sequencedQueue = gc.sequencedMessages;
-
+			SequencerWindow seqWindow = new SequencerWindow();
 			sequencingThread = new Thread(() -> {
 				try {
 					while (!stop) {
@@ -115,6 +117,12 @@ public class BroadcastSample {
 							System.out.println(
 									"Nº Sequencia: " + message.getSequence() + " -> " + (String) message.getPayload());
 							System.out.println("--------------------------------------");
+							seqWindow.updateSequenced((String) message.getPayload());
+							Thread.sleep((int)GroupCommunicator.TIME_FACTOR*250);
+							seqWindow.updateSequence();
+							seqWindow.updateSequenced(message.getSequence()  + " -> " + (String) message.getPayload());
+							Thread.sleep((int)GroupCommunicator.TIME_FACTOR*250);
+							seqWindow.updateSequenced("");
 						}
 					}
 				} catch (InterruptedException e) {
@@ -126,11 +134,17 @@ public class BroadcastSample {
 
 		gc.setDelayedBroadcast(true);
 		int broadcastsAmount = Integer.valueOf(args[1]);
+		Random rand = new Random();
 		for (int i = 0; i < broadcastsAmount; i++) {
-			String m = gc.getId()+"";
-			Thread.sleep(1000);
+			String m = gc.getId()+""+String.valueOf((char)(i + 65));
+			Thread.sleep((int)GroupCommunicator.TIME_FACTOR*(500+rand.nextInt(2000)));
+			System.out.println("ENVIANDO");
+			window.updateLastSent(m);
 			gc.broadcast(m);
 		}
+		Thread.sleep((int)GroupCommunicator.TIME_FACTOR*1000);
+		window.updateLastSent("");
+		
 		scanner.nextLine();
 		stop = true;
 		receiveingThread.join();
