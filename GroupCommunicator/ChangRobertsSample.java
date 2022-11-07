@@ -51,7 +51,7 @@ public class ChangRobertsSample {
 								System.out.println("Enviando para "+next);
 								
 								Thread.sleep(1000);
-								gc.send(next, message);
+								gc.send(next, message, -1);
 							}else if(((int)message[1])<gc.getId()){
 								//não é o q iniciou a eleição e é maior
 								//atualiza o maior
@@ -64,7 +64,7 @@ public class ChangRobertsSample {
 								
 								message[1] = gc.getId();
 								Thread.sleep(1000);
-								gc.send(next, message);
+								gc.send(next, message, -1);
 							}else {
 								//não é o q iniciou a eleição e não é maior
 								//repassa a mensagem
@@ -73,7 +73,7 @@ public class ChangRobertsSample {
 								System.out.println("Não sou maior, repassando "+ message[1] +" para "+next);
 								
 								Thread.sleep(1000);
-								gc.send(next, message);
+								gc.send(next, message, -1);
 							}
 						}else if(message[0].equals("elected")){
 							if(((int)message[2]) != gc.getId()) {
@@ -86,7 +86,7 @@ public class ChangRobertsSample {
 								System.out.println("Repassando para "+next);
 								
 								Thread.sleep(1000);
-								gc.send(next, message);
+								gc.send(next, message, -1);
 							}else {
 								System.out.println("Fim eleição");
 							}
@@ -112,14 +112,14 @@ public class ChangRobertsSample {
 				if(delay > 0) {
 					gc.send(id, message, delay);
 				}else {
-					gc.send(id, message);
+					gc.send(id, message, -1);
 				}
 			}else if(comando.equals("broadcast")){
 				Object[] message = {"message",scanner.next()};
-				gc.broadcast(message);
+				gc.broadcast(message, -1);
 			}else if(comando.equals("eleger")){
 				Object[] election = {"election", gc.getId(), gc.getId()};
-				gc.send(gc.getNeighbor(), election);
+				gc.send(gc.getNeighbor(), election, -1);
 			} else if(comando.equals("idlider")){
 				System.out.println(leader);
 			} else if(comando.equals("stop")){

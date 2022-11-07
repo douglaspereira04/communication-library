@@ -266,7 +266,7 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 	 * Sends message Follows Schiper-Eggli-Sandoz protocol to maintain causal order
 	 */
 	@Override
-	public void send(int id, Object payload) throws IOException {
+	public void send(int id, Object payload, int sender) throws IOException {
 		synchronized (vectorClocks) {
 			
 			this.vectorClocks.get(this.id).increment(this.id);
@@ -274,7 +274,7 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 			Message message = new Message(
 					MessageType.UNICAST, payload, 
 					this.vectorClocks, 
-					this.vectorClocks.get(this.id));
+					this.vectorClocks.get(this.id), sender);
 
 			ObjectOutputStream out = this.outStream.get(id);
 			synchronized (out) {
@@ -296,14 +296,14 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 	 * 
 	 * @throws ClassNotFoundException
 	 */
-	public void send(int id, Object payload, int delay) 
+	public void send(int id, Object payload, int delay, int sender) 
 			throws IOException, ClassNotFoundException {
 		synchronized (vectorClocks) {
 			this.vectorClocks.get(this.id).increment(this.id);
 			//copy to prevents the vectors in message to change
 			Message message = copy(new Message(MessageType.UNICAST, 
 					payload, this.vectorClocks, 
-					this.vectorClocks.get(this.id)));
+					this.vectorClocks.get(this.id), sender));
 
 			ObjectOutputStream out = this.outStream.get(id);
 			new Thread(() -> {
@@ -329,8 +329,8 @@ public class OrderedGroupCommunicator extends GroupCommunicator {
 	 * message with payload as message payload.
 	 */
 	@Override
-	public void broadcast(Object payload) throws IOException {
-		Message message = new Message(MessageType.SEQ, payload);
+	public void broadcast(Object payload, int sender) throws IOException {
+		Message message = new Message(MessageType.SEQ, payload, sender);
 		ObjectOutputStream out = this.outStream.get(this.sequencer);
 		synchronized (out) {
 			out.writeObject(message);

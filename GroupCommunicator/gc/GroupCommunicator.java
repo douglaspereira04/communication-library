@@ -292,8 +292,8 @@ public class GroupCommunicator {
 	 * @param message
 	 * @throws IOException
 	 */
-	public void send(int id, Object payload) throws IOException {
-		Message message = new Message(MessageType.MESSAGE, payload);
+	public void send(int id, Object payload, int sender) throws IOException {
+		Message message = new Message(MessageType.MESSAGE, payload, sender);
 		synchronized (this.outStream.get(id)) {
 			this.outStream.get(id).writeObject(message);
 		}
@@ -307,9 +307,9 @@ public class GroupCommunicator {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	public void send(int id, Object payload, int delay) 
+	public void send(int id, Object payload, int delay, int sender) 
 			throws IOException, ClassNotFoundException {
-		Message message = new Message(MessageType.MESSAGE, payload);
+		Message message = new Message(MessageType.MESSAGE, payload, sender);
 		Message copy = copy(message);
 		ObjectOutputStream out = this.outStream.get(id);
 		new Thread(() -> {
@@ -330,8 +330,8 @@ public class GroupCommunicator {
 	 * @param payload
 	 * @throws IOException
 	 */
-	public void broadcast(Object payload) throws IOException {
-		Message message = new Message(MessageType.MESSAGE, payload);
+	public void broadcast(Object payload, int sender) throws IOException {
+		Message message = new Message(MessageType.MESSAGE, payload, sender);
 		this.broadcast(message);
 	}
 

@@ -26,13 +26,13 @@ public class UnicastSample {
 		if (gc.getId() == 0) {
 			String m = "0";
 			gc.send(2, m, 1000);
-			gc.send(1, m);
+			gc.send(1, m, -1);
 
 		}
 		if (gc.getId() == 1) {
 			System.err.println((String) (gc.receive().getPayload()));
 			String m = "1";
-			gc.send(2, m);
+			gc.send(2, m, -1);
 		}
 		if (gc.getId() == 2) {
 			for (int i = 0; i < 2; i++) {

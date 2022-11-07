@@ -43,19 +43,17 @@ public class BroadcastSample {
 			try {
 				while (!stop) {
 					//System.out.println("---------------ESPERA--------------");
-					ArrayList<Object> pendingList = new ArrayList<>();
+					ArrayList<Message> pendingList = new ArrayList<>();
 					for (Iterator<Message> iterator = pending.iterator(); iterator.hasNext();) {
 						Message message = (Message) iterator.next();
-						String str = "Nº Sequencia: " + message.getSequence() + " -> " + (String) message.getPayload();
-						pendingList.add(str);
+						pendingList.add(message);
 					}
 					
 					for (Iterator<Message> iterator = delivered.iterator(); iterator.hasNext();) {
 						Message message = (Message) iterator.next();
-						String str = "Nº Sequencia: " + message.getSequence() + " -> " + (String) message.getPayload();
-						pendingList.add(str);
+						pendingList.add(message);
 					}
-					window.updatePending(pendingList.toArray());
+					window.updatePending(pendingList);
 					
 					Message received = gc.receive(100);
 					
@@ -63,14 +61,12 @@ public class BroadcastSample {
 					pendingList.clear();
 					for (Iterator<Message> iterator = pending.iterator(); iterator.hasNext();) {
 						Message message = (Message) iterator.next();
-						String str = "Nº Sequencia: " + message.getSequence() + " -> " + (String) message.getPayload();
-						pendingList.add(str);
+						pendingList.add(message);
 					}
 					
 					for (Iterator<Message> iterator = delivered.iterator(); iterator.hasNext();) {
 						Message message = (Message) iterator.next();
-						String str = "Nº Sequencia: " + message.getSequence() + " -> " + (String) message.getPayload();
-						pendingList.add(str);
+						pendingList.add(message);
 					}
 					
 					if (received != null) {
@@ -79,20 +75,19 @@ public class BroadcastSample {
 
 						//System.out.println("---------------RECEBIDO---------------");
 						Thread.sleep((int)GroupCommunicator.TIME_FACTOR*500);
-						String str = "Nº Sequencia: " + received.getSequence() + " -> " + (String) received.getPayload();
 						//System.err.println((String) received.getPayload());
-						pendingList.add(0, str);
-						window.updatePending(pendingList.toArray());
+						pendingList.add(0, received);
+						window.updatePending(pendingList);
 
 						Thread.sleep((int)GroupCommunicator.TIME_FACTOR*500);
 						
-						pendingList.remove(str);
-						window.updatePending(pendingList.toArray());
+						pendingList.remove(received);
+						window.updatePending(pendingList);
 						
-						window.updateReceived(received.getPayload());
+						window.updateReceived(received);
 						//System.out.println("--------------------------------------");
 					} else {
-						window.updatePending(pendingList.toArray());
+						window.updatePending(pendingList);
 						//System.out.println("--------------------------------------");
 
 					}
@@ -117,12 +112,14 @@ public class BroadcastSample {
 							System.out.println(
 									"Nº Sequencia: " + message.getSequence() + " -> " + (String) message.getPayload());
 							System.out.println("--------------------------------------");
-							seqWindow.updateSequenced((String) message.getPayload());
+							long seq = message.getSequence();
+							message.setSequence(-1);
+							seqWindow.updateSequenced(message);
 							Thread.sleep((int)GroupCommunicator.TIME_FACTOR*250);
 							seqWindow.updateSequence();
-							seqWindow.updateSequenced(message.getSequence()  + " -> " + (String) message.getPayload());
+							message.setSequence(seq);
+							seqWindow.updateSequenced(message);
 							Thread.sleep((int)GroupCommunicator.TIME_FACTOR*250);
-							seqWindow.updateSequenced("");
 						}
 					}
 				} catch (InterruptedException e) {
@@ -136,11 +133,11 @@ public class BroadcastSample {
 		int broadcastsAmount = Integer.valueOf(args[1]);
 		Random rand = new Random();
 		for (int i = 0; i < broadcastsAmount; i++) {
-			String m = gc.getId()+""+String.valueOf((char)(i + 65));
+			String m = String.valueOf((char)(i + 65));
 			Thread.sleep((int)GroupCommunicator.TIME_FACTOR*(500+rand.nextInt(2000)));
 			System.out.println("ENVIANDO");
 			window.updateLastSent(m);
-			gc.broadcast(m);
+			gc.broadcast(m, paramId);
 		}
 		Thread.sleep((int)GroupCommunicator.TIME_FACTOR*1000);
 		window.updateLastSent("");

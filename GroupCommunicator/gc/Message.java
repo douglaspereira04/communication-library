@@ -11,24 +11,27 @@ public class Message implements Serializable{
 	
 	protected Object payload;
 	protected MessageType type;
-	protected long sequence;
+	protected long sequence = -1;
 	protected Map<Integer, VectorClock> vp;
 	protected VectorClock tm;
+	public int sender = -1;
 	
 	public Message() {
 		
 	}
 	
-	public Message(MessageType type, Object payload) {
+	public Message(MessageType type, Object payload, int sender) {
 		this.payload = payload;
 		this.type = type;
+		this.sender = sender;
 	}
 	
-	public Message(MessageType type, Object payload, Map<Integer, VectorClock> vp, VectorClock tm) {
+	public Message(MessageType type, Object payload, Map<Integer, VectorClock> vp, VectorClock tm, int sender) {
 		this.payload = payload;
 		this.type = type;
 		this.vp = vp;
 		this.tm = tm;
+		this.sender = sender;
 	}
 	
 	public Object getPayload() {
