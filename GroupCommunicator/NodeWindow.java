@@ -12,6 +12,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
 
 import gc.Message;
 
@@ -37,6 +38,8 @@ public class NodeWindow extends JFrame {
 	protected Lock lock = new ReentrantLock();
 	
 	protected JScrollPane scroll;
+	
+    
 	public NodeWindow(int id) {
 		this.id = id;
 
@@ -111,25 +114,30 @@ public class NodeWindow extends JFrame {
 		
 		
 	}
+	
+	static Color[] color = new Color[] {
+			new Color(66, 135, 245),
+			new Color(245, 96, 66),
+			new Color(120,180,110),
+			new Color(230,220,110),
+			new Color(230,140,90)
+			
+	};
+	static LineBorder line = new LineBorder(Color.GRAY, 2, true);
 
 	public JLabel messageLabel(Message m) {
 		JLabel label = new JLabel();
 		label.setOpaque(true);
 		label.setSize(100, 100);
-		if(m.sender == 0 ) {
-			label.setBackground(new Color(66, 135, 245));
-		}else if(m.sender == 1 ) {
-			label.setBackground(new Color(245, 96, 66));
-		}else {
-			label.setBackground(new Color(147, 245, 66));
-		}
+		
+		label.setBackground(color[m.sender]);
 		
 		if(m.getSequence() != -1) {
 			label.setText(m.getSequence()+" -> "+m.getPayload());
 		}else {
 			label.setText(""+m.getPayload());
 		}
-		
+		label.setBorder(line);
 		return label;
 
 	}
@@ -139,13 +147,9 @@ public class NodeWindow extends JFrame {
 		label.setSize(100, 100);
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		label.setVerticalAlignment(SwingConstants.CENTER);
-		if(id == 0 ) {
-			label.setBackground(new Color(66, 135, 245));
-		}else if(id == 1 ) {
-			label.setBackground(new Color(245, 96, 66));
-		}else {
-			label.setBackground(new Color(147, 245, 66));
-		}
+		
+		label.setBackground(color[id]);
+		label.setBorder(line);
 		
 		return label;
 
@@ -153,7 +157,6 @@ public class NodeWindow extends JFrame {
 
 	public void updatePending(ArrayList<Message> data) {
 		lock.lock();
-		panel.invalidate();
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 1;
 		c.gridy = 1;
@@ -191,6 +194,7 @@ public class NodeWindow extends JFrame {
 		
 		pendingArray = p;
 
+		panel.invalidate();
 		panel.validate();
 		panel.repaint();
 
@@ -199,7 +203,6 @@ public class NodeWindow extends JFrame {
 	
 	public void updateReceived(Message received) {
 		lock.lock();
-		panel.invalidate();
 		JLabel label = messageLabel(received);
 
 		GridBagConstraints c = new GridBagConstraints();
@@ -214,7 +217,8 @@ public class NodeWindow extends JFrame {
 		
 		seq++;
 		sequenceLabel.setText("SEQ: "+seq);
-		
+
+		panel.invalidate();
 		panel.validate();
 		panel.repaint();
 		lock.unlock();
@@ -222,7 +226,6 @@ public class NodeWindow extends JFrame {
 	
 	public void updateLastSent(String sent) {
 		lock.lock();
-		panel.invalidate();
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 2;
@@ -236,6 +239,7 @@ public class NodeWindow extends JFrame {
 		}
 		panel.add(sentLabel, c);
 
+		panel.invalidate();
 		panel.validate();
 		panel.repaint();
 		lock.unlock();

@@ -74,12 +74,12 @@ public class BroadcastSample {
 						//System.out.println("--------------------------------------");
 
 						//System.out.println("---------------RECEBIDO---------------");
-						Thread.sleep((int)GroupCommunicator.TIME_FACTOR*500);
+						Thread.sleep((int)GroupCommunicator.TIME_FACTOR*200);
 						//System.err.println((String) received.getPayload());
 						pendingList.add(0, received);
 						window.updatePending(pendingList);
 
-						Thread.sleep((int)GroupCommunicator.TIME_FACTOR*500);
+						Thread.sleep((int)GroupCommunicator.TIME_FACTOR*800);
 						
 						pendingList.remove(received);
 						window.updatePending(pendingList);

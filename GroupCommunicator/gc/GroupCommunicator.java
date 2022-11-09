@@ -42,7 +42,7 @@ public class GroupCommunicator {
 	protected List<Integer> ids;
 	
 	protected boolean stop = false;
-	public static float TIME_FACTOR = 1;
+	public static float TIME_FACTOR = 2;
 
 
 	/**

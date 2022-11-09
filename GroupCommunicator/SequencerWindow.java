@@ -1,11 +1,8 @@
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
@@ -60,13 +57,8 @@ public class SequencerWindow extends JFrame {
 	public JLabel messageLabel(JLabel label, Message m) {
 		label.setOpaque(true);
 		label.setSize(100, 100);
-		if(m.sender == 0 ) {
-			label.setBackground(new Color(66, 135, 245));
-		}else if(m.sender == 1 ) {
-			label.setBackground(new Color(245, 96, 66));
-		}else {
-			label.setBackground(new Color(147, 245, 66));
-		}
+		label.setBackground(NodeWindow.color[m.sender]);
+		label.setBorder(NodeWindow.line);
 		
 		if(m.getSequence() != -1) {
 			label.setText(m.getSequence()+" -> "+m.getPayload());
