@@ -85,7 +85,7 @@ public class NodeWindow extends JFrame {
 
 		c.gridx = 0;
 		c.gridy = 1;
-		panel.add(new JLabel("ENVIADO: "), c);
+		panel.add(new JLabel("ENVIANDO: "), c);
 
 		c.gridx = 0;
 		c.gridy = 2;
