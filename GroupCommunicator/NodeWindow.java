@@ -133,7 +133,7 @@ public class NodeWindow extends JFrame {
 		label.setBackground(color[m.sender]);
 		
 		if(m.getSequence() != -1) {
-			label.setText(m.getSequence()+" -> "+m.getPayload());
+			label.setText(m.getSequence()+" , "+m.getPayload());
 		}else {
 			label.setText(""+m.getPayload());
 		}
